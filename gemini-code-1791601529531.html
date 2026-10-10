@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitScale - Tu Copiloto de Nutrición y Entrenamiento Inteligente</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            dark: '#0b132b',
+                            card: '#1c2541'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .glass-panel {
+            background: rgba(28, 37, 65, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col">
+
+    <!-- HEADER / NAV TOP -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 font-black text-xl">
+                    F
+                </div>
+                <span class="text-xl font-bold tracking-tight text-white">Fit<span class="text-brand-500">Scale</span></span>
+            </div>
+            
+            <div id="trialBadge" class="hidden sm:flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-400 px-3 py-1.5 rounded-full text-xs font-semibold">
+                <i class="fa-solid fa-clock"></i> Prueba Gratis: <span id="trialDays">7 días restantes</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="openWebpayModal()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl font-semibold text-xs transition shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved"></i> Webpay Plus
+                </button>
+                <button onclick="toggleAuthModal()" id="btnUserAuth" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl font-semibold text-xs transition border border-slate-700">
+                    <i class="fa-solid fa-user mr-1"></i> Mi Cuenta
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVEGACIÓN POR PESTAÑAS (TABS) -->
+    <nav class="bg-slate-900 border-b border-slate-800 sticky top-16 z-40">
+        <div class="max-w-7xl mx-auto px-2 flex justify-around sm:justify-center sm:gap-8 text-xs sm:text-sm font-semibold">
+            <button onclick="switchTab('tabObjetivos')" id="nav-tabObjetivos" class="tab-btn py-3.5 px-3 border-b-2 border-brand-500 text-brand-500 flex items-center gap-2 transition">
+                <i class="fa-solid fa-bullseye"></i> <span>Objetivos</span>
+            </button>
+            <button onclick="switchTab('tabEntreno')" id="nav-tabEntreno" class="tab-btn py-3.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 transition">
+                <i class="fa-solid fa-dumbbell"></i> <span>Entrenamiento</span>
+            </button>
+            <button onclick="switchTab('tabNutricion')" id="nav-tabNutricion" class="tab-btn py-3.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 transition">
+                <i class="fa-solid fa-utensils"></i> <span>Nutrición</span>
+            </button>
+            <button onclick="switchTab('tabChat')" id="nav-tabChat" class="tab-btn py-3.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 transition">
+                <i class="fa-solid fa-robot"></i> <span>Chat IA</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL POR PESTAÑAS -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+        <!-- PESTAÑA 1: OBJETIVOS -->
+        <section id="tabObjetivos" class="tab-content space-y-8">
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-bullseye text-brand-500"></i> Configuración de Objetivos del Cliente
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Define tus parámetros para que la IA adapte tus calorías y volumen de entrenamiento.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400 block mb-2">Peso Actual (kg)</label>
+                            <input type="number" id="objPeso" value="78" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white" onchange="calcularSimulador()">
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400 block mb-2">Meta Principal</label>
+                            <select id="objMeta" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white" onchange="calcularSimulador()">
+                                <option value="perder">Perder Grasa Corporal</option>
+                                <option value="mantener">Recomposición Corporal</option>
+                                <option value="ganar">Ganar Masa Muscular</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400 block mb-2">Nivel de Experiencia</label>
+                            <select class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white">
+                                <option>Principiante (&lt; 6 meses)</option>
+                                <option selected>Intermedio (1-3 años)</option>
+                                <option>Avanzado (&gt; 3 años)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- PROYECCIÓN DE PESO (GRÁFICO) -->
+                    <div class="md:col-span-2 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                        <h3 class="text-sm font-bold text-slate-300 mb-2">Proyección a 8 Semanas</h3>
+                        <div class="h-52 relative">
+                            <canvas id="chartObjetivos"></canvas>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mt-4 text-center font-mono text-xs">
+                            <div class="bg-slate-800 p-2 rounded-xl"><span class="text-slate-400 block text-[10px]">Meta</span><strong id="resMetaKg" class="text-brand-500">74.0 kg</strong></div>
+                            <div class="bg-slate-800 p-2 rounded-xl"><span class="text-slate-400 block text-[10px]">Calorías/Día</span><strong id="resCalorias" class="text-white">1,950 kcal</strong></div>
+                            <div class="bg-slate-800 p-2 rounded-xl"><span class="text-slate-400 block text-[10px]">Proteínas</span><strong class="text-blue-400">156g/día</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 2: ENTRENAMIENTO -->
+        <section id="tabEntreno" class="tab-content hidden space-y-8">
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-8">
+                <!-- GENERADOR INTERACTIVO DE DÍAS DE ENTRENO -->
+                <div>
+                    <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3">
+                        <i class="fa-solid fa-dumbbell text-brand-500"></i> Plan de Entrenamiento Personalizado
+                    </h2>
+                    <p class="text-slate-400 text-sm mb-6">Selecciona cuántos días a la semana puedes entrenar y la IA estructurará tu rutina óptima.</p>
+
+                    <div class="flex flex-wrap gap-3 mb-6">
+                        <span class="text-xs font-bold text-slate-400 flex items-center mr-2">Días disponibles:</span>
+                        <button onclick="setDiasEntreno(2)" class="btn-dia px-4 py-2 rounded-xl bg-slate-800 hover:bg-brand-600 text-xs font-bold border border-slate-700 transition">2 Días (Fullbody)</button>
+                        <button onclick="setDiasEntreno(3)" class="btn-dia px-4 py-2 rounded-xl bg-slate-800 hover:bg-brand-600 text-xs font-bold border border-slate-700 transition">3 Días (Torso/Pierna)</button>
+                        <button onclick="setDiasEntreno(4)" class="btn-dia px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-bold border border-brand-500 shadow-lg">4 Días (Push/Pull/Legs)</button>
+                        <button onclick="setDiasEntreno(5)" class="btn-dia px-4 py-2 rounded-xl bg-slate-800 hover:bg-brand-600 text-xs font-bold border border-slate-700 transition">5 Días (Frecuencia 2)</button>
+                    </div>
+
+                    <!-- REGISTRO DE ASISTENCIA SEMANAL -->
+                    <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800 mb-8">
+                        <span class="text-xs font-bold text-slate-300 block mb-3">Registro de Asistencia esta semana:</span>
+                        <div class="grid grid-cols-7 gap-2 text-center text-xs">
+                            <button onclick="toggleDia(this)" class="p-3 bg-brand-500/20 border border-brand-500/40 text-brand-400 font-bold rounded-xl">Lun ✓</button>
+                            <button onclick="toggleDia(this)" class="p-3 bg-brand-500/20 border border-brand-500/40 text-brand-400 font-bold rounded-xl">Mar ✓</button>
+                            <button onclick="toggleDia(this)" class="p-3 bg-slate-800 border border-slate-700 text-slate-500 rounded-xl">Mié</button>
+                            <button onclick="toggleDia(this)" class="p-3 bg-brand-500/20 border border-brand-500/40 text-brand-400 font-bold rounded-xl">Jue ✓</button>
+                            <button onclick="toggleDia(this)" class="p-3 bg-slate-800 border border-slate-700 text-slate-500 rounded-xl">Vie</button>
+                            <button onclick="toggleDia(this)" class="p-3 bg-slate-800 border border-slate-700 text-slate-500 rounded-xl">Sáb</button>
+                            <button onclick="toggleDia(this)" class="p-3 bg-slate-800 border border-slate-700 text-slate-500 rounded-xl">Dom</button>
+                        </div>
+                    </div>
+
+                    <!-- RUTINA GENERADA Y REGISTRO DE PESOS -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4">
+                            <h3 class="text-sm font-bold text-brand-500 uppercase tracking-wider">Rutina de Hoy: Pecho & Tríceps</h3>
+                            <div class="space-y-3">
+                                <div class="bg-slate-800/60 p-3 rounded-xl flex justify-between items-center text-xs">
+                                    <div>
+                                        <span class="font-bold text-white block">Press de Banca Plano</span>
+                                        <span class="text-slate-400">4 series x 8-10 reps</span>
+                                    </div>
+                                    <input type="text" placeholder="Ej: 80 kg" class="w-20 bg-slate-900 border border-slate-700 px-2 py-1 rounded text-center text-white font-mono">
+                                </div>
+                                <div class="bg-slate-800/60 p-3 rounded-xl flex justify-between items-center text-xs">
+                                    <div>
+                                        <span class="font-bold text-white block">Press Inclinado con Mancuernas</span>
+                                        <span class="text-slate-400">3 series x 10-12 reps</span>
+                                    </div>
+                                    <input type="text" placeholder="Ej: 28 kg" class="w-20 bg-slate-900 border border-slate-700 px-2 py-1 rounded text-center text-white font-mono">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FOTOS DE AVANCE FÍSICO -->
+                        <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-sm font-bold text-purple-400 uppercase tracking-wider mb-2">Fotos de Avance Físico</h3>
+                                <p class="text-xs text-slate-400 mb-4">Sube tus capturas para que la IA evalúe la composición corporal.</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 text-center">
+                                <div class="bg-slate-800 p-3 rounded-xl border border-slate-700">
+                                    <span class="text-[10px] text-slate-400 block mb-1">Mes 1</span>
+                                    <div class="h-24 bg-slate-900 rounded-lg flex items-center justify-center text-slate-600">
+                                        <i class="fa-solid fa-user text-2xl"></i>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 cursor-pointer hover:border-brand-500 transition" onclick="document.getElementById('inputFotoFit').click()">
+                                    <span class="text-[10px] text-brand-400 block mb-1">+ Nueva Foto</span>
+                                    <div class="h-24 bg-slate-900 rounded-lg flex items-center justify-center text-brand-500">
+                                        <i class="fa-solid fa-camera text-2xl"></i>
+                                    </div>
+                                    <input type="file" id="inputFotoFit" class="hidden" onchange="alert('Foto guardada correctamente en tu perfil.')">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 3: NUTRICIÓN (ESTILO FITIA) -->
+        <section id="tabNutricion" class="tab-content hidden space-y-8">
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 space-y-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3">
+                        <i class="fa-solid fa-utensils text-brand-500"></i> Registro Nutricional Diario
+                    </h2>
+                    <p class="text-slate-400 text-sm">Escanea tu plato con fotos IA o ingresa los alimentos manualmente.</p>
+                </div>
+
+                <!-- RUEDA DE MACROS ESTILO FITIA -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-900/80 p-6 rounded-2xl border border-slate-800 items-center">
+                    <div class="text-center relative flex flex-col items-center justify-center">
+                        <div class="w-36 h-36 rounded-full border-8 border-slate-800 border-t-brand-500 border-r-blue-500 flex flex-col items-center justify-center">
+                            <span id="txtCalConsumidas" class="text-2xl font-black text-white">1,240</span>
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">de 1,950 kcal</span>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2 space-y-3 font-mono text-xs">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-brand-400 font-bold">Proteínas</span>
+                                <span class="text-slate-300">110g / 156g</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-brand-500 h-full w-[70%]"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-blue-400 font-bold">Carbohidratos</span>
+                                <span class="text-slate-300">140g / 200g</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-blue-500 h-full w-[65%]"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-amber-400 font-bold">Grasas</span>
+                                <span class="text-slate-300">38g / 55g</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-amber-500 h-full w-[50%]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REGISTRO MANUAL O CON FOTO -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- REGISTRO CON FOTO IA -->
+                    <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 text-center space-y-4">
+                        <h3 class="text-xs font-bold text-slate-300 uppercase">Escanear Plato con Foto IA</h3>
+                        <div class="border-2 border-dashed border-slate-700 rounded-xl p-6 cursor-pointer hover:border-brand-500 transition" onclick="document.getElementById('inputComidaFoto').click()">
+                            <i class="fa-solid fa-camera text-3xl text-slate-500 mb-2"></i>
+                            <p class="text-xs text-slate-400">Toma una foto a tu comida para calcular macros automáticamente</p>
+                            <input type="file" id="inputComidaFoto" accept="image/*" class="hidden" onchange="escanearComidaFoto()">
+                        </div>
+                    </div>
+
+                    <!-- REGISTRO MANUAL -->
+                    <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <h3 class="text-xs font-bold text-slate-300 uppercase">Añadir Alimento Manual</h3>
+                        <div class="space-y-2">
+                            <input type="text" id="manAlimento" placeholder="Ej: Pechuga de Pollo" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" id="manGramos" placeholder="Gramos (ej: 150g)" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white">
+                                <button onclick="agregarComidaManual()" class="bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs rounded-xl py-2 transition">
+                                    + Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 4: CHAT IA -->
+        <section id="tabChat" class="tab-content hidden space-y-8">
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 h-[600px] flex flex-col justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-robot text-brand-500"></i> Asistente Nutricional y Deportivo FitScale
+                    </h2>
+                    <p class="text-xs text-slate-400">Resuelve cualquier duda sobre tu rutina, suplementos o sustitución de alimentos en tiempo real.</p>
+                </div>
+
+                <!-- MENSAJES CHAT -->
+                <div id="chatBox" class="flex-1 my-4 bg-slate-900/80 rounded-2xl p-4 overflow-y-auto space-y-3 text-xs">
+                    <div class="bg-slate-800 p-3 rounded-xl max-w-md text-slate-200">
+                        ¡Hola! Soy tu copiloto de FitScale. ¿Tienes alguna pregunta sobre tu plan de entrenamiento o nutrición de hoy?
+                    </div>
+                </div>
+
+                <!-- INPUT CHAT -->
+                <div class="flex gap-2">
+                    <input type="text" id="chatInput" placeholder="Ej: ¿Con qué puedo reemplazar el pollo hoy?" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-brand-500">
+                    <button onclick="enviarMensajeChat()" class="bg-brand-600 hover:bg-brand-500 text-white font-bold px-5 rounded-xl text-xs transition">
+                        Enviar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL WEBPAY PLUS (TRANSBANK) -->
+    <div id="modalWebpay" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl max-w-md w-full relative text-center shadow-2xl">
+            <button onclick="closeWebpayModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-16 h-16 bg-red-600/20 text-red-500 rounded-2xl flex items-center justify-center text-3xl mx-auto border border-red-500/30 mb-4">
+                <i class="fa-solid fa-credit-card"></i>
+            </div>
+            
+            <h3 class="text-2xl font-bold text-white mb-1">Pago Seguro con Webpay</h3>
+            <p class="text-xs text-slate-400 mb-6">Serás redirigido a la plataforma oficial de Transbank para completar tu suscripción mensual ($4.990 CLP / $4.99 USD).</p>
+
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-left text-xs mb-6 space-y-2">
+                <div class="flex justify-between"><span class="text-slate-400">Comercio:</span><span class="font-bold text-white">FitScale Chile SpA</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Monto:</span><span class="font-bold text-brand-400">$4.990 CLP / mes</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Medios de Pago:</span><span class="text-slate-300">Débito / Crédito</span></div>
+            </div>
+
+            <button onclick="simularRedireccionWebpay()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3.5 rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2">
+                <i class="fa-solid fa-lock"></i> Ir a Webpay Plus
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT DE FITSCALE -->
+    <script>
+        let myChartObjetivos;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const ctx = document.getElementById('chartObjetivos').getContext('2d');
+            myChartObjetivos = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6', 'Sem 7', 'Sem 8'],
+                    datasets: [{
+                        label: 'Peso (kg)',
+                        data: [78, 77.4, 76.8, 76.2, 75.6, 75.0, 74.5, 74.0],
+                        borderColor: '#10b981',
+                        fill: false,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        });
+
+        // Cambiar entre Pestañas
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-brand-500', 'text-brand-500');
+                el.classList.add('border-transparent', 'text-slate-400');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const navBtn = document.getElementById('nav-' + tabId);
+            navBtn.classList.remove('border-transparent', 'text-slate-400');
+            navBtn.classList.add('border-brand-500', 'text-brand-500');
+        }
+
+        // Marcar Día Entrenado
+        function toggleDia(btn) {
+            if (btn.classList.contains('bg-brand-500/20')) {
+                btn.className = "p-3 bg-slate-800 border border-slate-700 text-slate-500 rounded-xl";
+                btn.innerText = btn.innerText.replace(' ✓', '');
+            } else {
+                btn.className = "p-3 bg-brand-500/20 border border-brand-500/40 text-brand-400 font-bold rounded-xl";
+                btn.innerText += ' ✓';
+            }
+        }
+
+        // Días de entrenamiento
+        function setDiasEntreno(dias) {
+            alert("Rutina actualizada a " + dias + " días a la semana. Se han ajustado el volumen de series y descansos.");
+        }
+
+        // Escanear foto comida
+        function escanearComidaFoto() {
+            alert("Foto procesada por IA: Se detectaron 200g de Arroz y 150g de Carne. Se sumaron 450 kcal y 38g de proteína a tu rueda diaria.");
+        }
+
+        // Agregar Comida Manual
+        function agregarComidaManual() {
+            const alimento = document.getElementById('manAlimento').value;
+            const gramos = document.getElementById('manGramos').value;
+            if (alimento && gramos) {
+                alert("Registrado: " + gramos + "g de " + alimento + " añadidos a tus macros de hoy.");
+                document.getElementById('manAlimento').value = '';
+                document.getElementById('manGramos').value = '';
+            }
+        }
+
+        // Chat IA
+        function enviarMensajeChat() {
+            const input = document.getElementById('chatInput');
+            const box = document.getElementById('chatBox');
+            if (input.value.trim() !== "") {
+                const msgUser = document.createElement('div');
+                msgUser.className = "bg-brand-600/30 border border-brand-500/30 p-3 rounded-xl max-w-md ml-auto text-white font-semibold";
+                msgUser.innerText = input.value;
+                box.appendChild(msgUser);
+
+                setTimeout(() => {
+                    const msgIa = document.createElement('div');
+                    msgIa.className = "bg-slate-800 p-3 rounded-xl max-w-md text-slate-200";
+                    msgIa.innerText = "Respuesta de FitScale IA: Puedes sustituir esa proteína por 180g de merluza o 3 huevos enteros para mantener la misma meta calórica.";
+                    box.appendChild(msgIa);
+                    box.scrollTop = box.scrollHeight;
+                }, 800);
+
+                input.value = "";
+            }
+        }
+
+        // Modales Webpay
+        function openWebpayModal() { document.getElementById('modalWebpay').classList.remove('hidden'); }
+        function closeWebpayModal() { document.getElementById('modalWebpay').classList.add('hidden'); }
+        function simularRedireccionWebpay() {
+            alert("Conectando con Transbank Webpay Plus... (Transacción de prueba completada).");
+            closeWebpayModal();
+        }
+        function toggleAuthModal() {
+            alert("FitScale: Tu cuenta está activa en el período de prueba gratuito de 7 días.");
+        }
+    </script>
+</body>
+</html>
